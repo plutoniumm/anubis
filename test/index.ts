@@ -1,3 +1,4 @@
+import T from "./types";
 import DF from "./dataframe";
 import * as cheerio from 'cheerio';
 import { table2json, levenstein } from './string';
@@ -24,7 +25,8 @@ const first = table2json(tables.first());
 
 const df = new DF(
   first,
-  ["Rank", "Country", "Population", "Percentage", "Date"]
+  ["Rank", "Country", "Population", "Percentage", "Date"],
+  [T.String, T.String, T.Number, T.Percentage, T.Date]
 );
 
 // print first 5 rows

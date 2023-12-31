@@ -5,7 +5,11 @@ type Lolomo<T> = Row<Row<T>>;
 class DataFrame {
   headers: Row<string> = [];
   data: Lolomo<any> = [[], []];
-  constructor(data: Lolomo<any>, headers: Boolean | Row<string> = true) {
+  constructor(
+    data: Lolomo<any>,
+    headers: Boolean | Row<string> = true,
+    types?: Function[]
+  ) {
     // all rows must have same length
     if (headers) {
       if (typeof headers === "boolean") {
@@ -37,6 +41,15 @@ class DataFrame {
       }
     } else {
       this.data = data;
+    }
+
+    // if types are provided, convert data
+    if (types) {
+      for (let i = 0; i < this.data.length; i++) {
+        for (let j = 0; j < this.data[i].length; j++) {
+          this.data[i][j] = types[j](this.data[i][j]);
+        }
+      }
     }
   }
 
