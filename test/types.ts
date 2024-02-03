@@ -15,4 +15,20 @@ export default {
   },
   Percentage: (x: string) => Number(x.replace("%", "")) / 100,
   Date: (x: string) => new Date(x),
+  RelativeDate: (x: string, format?: string) => {
+    const then = +new Date(x);
+    const now = +new Date();
+    if (!format) return then - now;
+    const allowedFormats = ["day", "week", "month", "year"];
+    if (!allowedFormats.includes(format)) {
+      throw new Error(`Format ${format} not allowed`);
+    }
+
+    const diff = now - then;
+    return new Intl.RelativeTimeFormat("en", {
+      numeric: "auto"
+      // there is probably some shitfuckery with the /1000
+      // i think it needs to change wrt day/month/week etc
+    }).format(Math.floor(diff / 1000), format as Intl.RelativeTimeFormatUnit);
+  }
 }
