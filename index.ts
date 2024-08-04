@@ -1,18 +1,12 @@
-import T from "./types";
-import DF from "./dataframe";
-import * as cheerio from 'cheerio';
+import T from "./src/types";
+import DF from "./src/dataframe";
+import { getWiki, get } from "./api";
 import { table2json, levenstein } from './string';
-const get = (url: string) => fetch(url).then(r => r.text());
 
-const wiki = "https://en.wikipedia.org/wiki/";
 const at = "List_of_countries_and_dependencies_by_population";
+const $ = getWiki(at, true)
 
-const data = await get(wiki + at);
-if (!data) throw new Error("No data");
-
-const $ = cheerio.load(data);
 const heading = "Sovereign states and dependencies by population";
-
 // match ANY h1/h2/h3/h4/h5/h6 tag for the heading
 const hmatch = $(`h1,h2`).filter((i, el) =>
   $(el).text().includes(heading)

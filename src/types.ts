@@ -2,6 +2,9 @@ export default {
   String: (x: string) => x,
   Number: (x: string) => {
     x = x.replace(/,/g, "");
+    // remove all non-numeric/kmb characters
+    x = x.replace(/(0-9)*(k|m|b)/gi, "");
+
     if (x.endsWith("k") || x.endsWith("k")) {
       return Number(x.replace("k", "").replace("K", "")) * 1000;
     }
@@ -30,5 +33,5 @@ export default {
       // there is probably some shitfuckery with the /1000
       // i think it needs to change wrt day/month/week etc
     }).format(Math.floor(diff / 1000), format as Intl.RelativeTimeFormatUnit);
-  }
+  },
 }
