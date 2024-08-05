@@ -1,9 +1,11 @@
 import * as cheerio from 'cheerio';
+import type { CheerioAPI } from 'cheerio';
 
 export const get = (url: string) => fetch(url).then(r => r.text());
 
-const wiki = "https://en.wikipedia.org/wiki/";
-export async function getWiki (page: string, parsed = false) {
+// .m will have less crap that needs to be parsed
+const wiki = "https://en.m.wikipedia.org/wiki/";
+export async function getWiki (page: string, parsed = false): P<CheerioAPI | string> {
   if (!page.includes("wikipedia.org")) {
     page = wiki + page;
   };

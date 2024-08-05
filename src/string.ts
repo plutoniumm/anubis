@@ -1,4 +1,15 @@
+import * as cheerio from "cheerio";
 import type { Cheerio } from "cheerio";
+
+export function relevenstein (a: string, b: string): number {
+  const max = Math.max(a.length, b.length);
+  const distance = levenstein(a, b);
+
+  let rel = distance * 100 / max
+  rel = ((100 - rel) | 0) / 100
+
+  return rel;
+}
 
 export function levenstein (a: string, b: string): number {
   let m = a.length;
@@ -24,19 +35,40 @@ export function levenstein (a: string, b: string): number {
   return d[m][n];
 }
 
-// take in cheerio table -> array of arrays
 export function table2json (table: Cheerio<any>): string[][] {
-  let rows = table.find("tr");
-  let data = [];
+  const $ = cheerio.load(table.html());
+
+  const rows = [];
+  table.find('tr').each((i, row) => {
+    const cols = [];
+    $(row).find('td, th').each((j, cell) => {
+      cols.push($(cell));
+    });
+    rows.push(cols);
+  });
+
+  const newTable = [];
   for (let i = 0; i < rows.length; i++) {
-    let row = rows.eq(i);
-    let cells = row.find("td,th");
-    let rowdata = [];
-    for (let j = 0; j < cells.length; j++) {
-      let cell = cells.eq(j);
-      rowdata.push(cell.text().trim());
-    }
-    data.push(rowdata);
+    newTable[i] = [];
   }
-  return data;
+
+  for (let row = 0; row < rows.length; row++) {
+    for (let col = 0; col < rows[row].length; col++) {
+      const cell = rows[row][col];
+      const rowspan = parseInt(cell.attr('rowspan')) || 1;
+      const colspan = parseInt(cell.attr('colspan')) || 1;
+      const cellContent = cell.text().trim();
+
+      let i = row, j = 0;
+      while (newTable[i][j] !== undefined) j++;
+
+      for (let r = 0; r < rowspan; r++) {
+        for (let c = 0; c < colspan; c++) {
+          newTable[i + r][j + c] = cellContent;
+        }
+      }
+    }
+  };
+
+  return newTable.map(row => row.map(cell => cell !== undefined ? cell : ''));
 }

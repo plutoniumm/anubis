@@ -1,3 +1,7 @@
+import * as cheerio from 'cheerio';
+
+const round = (x: number, d = 2) => (x * 10 ** d | 0) / 10 ** d;
+
 export default {
   String: (x: string) => x,
   Number: (x: string) => {
@@ -16,7 +20,7 @@ export default {
     }
     return Number(x);
   },
-  Percentage: (x: string) => Number(x.replace("%", "")) / 100,
+  Percentage: (x: string) => round(Number(x.replace("%", ""))),
   Date: (x: string) => new Date(x),
   RelativeDate: (x: string, format?: string) => {
     const then = +new Date(x);
@@ -34,4 +38,8 @@ export default {
       // i think it needs to change wrt day/month/week etc
     }).format(Math.floor(diff / 1000), format as Intl.RelativeTimeFormatUnit);
   },
+  Html: (x: string) => {
+    const $ = cheerio.load(`<div>${x}</div>`);
+    return $.text().trim();
+  }
 }
