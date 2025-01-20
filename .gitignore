@@ -1,3 +1,6 @@
-notes/
+local/
 .DS_Store
 node_modules
+.sesskey
+__pycache__/
+*.pyc

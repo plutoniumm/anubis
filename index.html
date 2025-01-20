@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Plotter</title>
+
+  <link rel="stylesheet" href="https://manav.ch/atomic.css">
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+</head>
+
+<body>
+  <h1>Enter Data</h1>
+  <form id="dataForm">
+    <label for="name1">Name 1:</label>
+    <input type="text" id="name1" name="name1" required><br><br>
+
+    <label for="name2">Name 2:</label>
+    <input type="text" id="name2" name="name2" required><br><br>
+
+    <label for="a">A:</label>
+    <input type="number" id="a" name="a" required><br><br>
+
+    <label for="b">B:</label>
+    <input type="number" id="b" name="b" required><br><br>
+
+    <button type="submit">Submit</button>
+
+    <style>
+      form {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+      }
+
+      label {
+        margin-bottom: 5px;
+      }
+
+      input {
+        margin-bottom: 10px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+
+      button {
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </form>
+
+  <div id="plot" style="width:600px;height:400px;"></div>
+
+  <script>
+    document.getElementById( 'dataForm' ).addEventListener( 'submit', async function ( event ) {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = new FormData( event.target );
+      const data = Object.fromEntries( formData.entries() );
+
+      try {
+        // Send data to server
+        const response = await fetch( '/process-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify( data ),
+        } );
+
+        if ( !response.ok ) {
+          throw new Error( 'Failed to fetch data from server' );
+        }
+
+        // Parse server response
+        const responseData = await response.json();
+
+        // Plot the data
+        const trace = {
+          x: responseData.x,
+          y: responseData.y,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Data Plot',
+        };
+
+        const layout = {
+          title: 'Server Data Plot',
+          xaxis: { title: 'X-axis' },
+          yaxis: { title: 'Y-axis' },
+        };
+
+        Plotly.newPlot( 'plot', [ trace ], layout );
+
+      } catch ( error ) {
+        console.error( 'Error:', error );
+        alert( 'An error occurred while processing your request.' );
+      }
+    } );
+  </script>
+</body>
+
+</html>
